@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Plan {
+  BASIC
+  PREMIUM
+}
+
+enum Role {
+  SUPER_ADMIN   // ME — the SaaS owner
+  SCHOOL_ADMIN  // Manages a single school
+  TEACHER       // Scoped to their classes
+  STUDENT       // Read-only, their own data
+  PARENT        // Premium — views their children's data
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+// ─── Core Tenant ──────────────────────────────────────────────────────────────
+
+model School {
+  id          String   @id @default(uuid())
+  name        String
+  subdomain   String   @unique  // e.g. "greenfield" for greenfield.myapp.com
+  address     String?
+  phone       String?
+  email       String?
+  logoUrl     String?
+  plan        Plan     @default(BASIC)
+  isActive    Boolean  @default(true)
+  trialEndsAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users    User[]
+  students Student[]
+  teachers Teacher[]
+  classes  Class[]
+
+  @@map("schools")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  schoolId     String?  // null only for SUPER_ADMIN
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  school        School?        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  refreshTokens RefreshToken[]
+  teacher       Teacher?
+  student       Student?
+
+  @@index([schoolId])
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// ─── Academic Structure ───────────────────────────────────────────────────────
+
+model Class {
+  id             String   @id @default(uuid())
+  schoolId       String
+  name           String   // e.g. "JSS 1A", "Grade 5B"
+  level          String   // e.g. "JSS 1", "Grade 5"
+  description    String?
+  classTeacherId String?  // FK to Teacher — assigned after teacher is created
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  students Student[]
+
+  @@unique([schoolId, name]) // Two classes in the same school cannot share a name
+  @@index([schoolId])
+  @@map("classes")
+}
+
+model Teacher {
+  id          String   @id @default(uuid())
+  schoolId    String
+  userId      String   @unique // Each user can only be a teacher once
+  employeeId  String?           // School's internal employee number
+  gender      Gender?
+  dateOfBirth DateTime?
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@map("teachers")
+}
+
+model Student {
+  id              String   @id @default(uuid())
+  schoolId        String
+  userId          String   @unique
+  classId         String?
+  admissionNumber String
+  gender          Gender?
+  dateOfBirth     DateTime?
+  address         String?
+  guardianName    String?
+  guardianPhone   String?
+  guardianEmail   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  class  Class? @relation(fields: [classId], references: [id])
+
+  @@unique([schoolId, admissionNumber]) // Admission numbers are unique per school
+  @@index([schoolId])
+  @@index([classId])
+  @@map("students")
+}
