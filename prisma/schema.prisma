@@ -28,6 +28,27 @@ enum Gender {
   OTHER
 }
 
+enum Term {
+  FIRST
+  SECOND
+  THIRD
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+}
+
 // ─── Core Tenant ──────────────────────────────────────────────────────────────
 
 model School {
@@ -49,6 +70,10 @@ model School {
   students Student[]
   teachers Teacher[]
   classes  Class[]
+  subjects   Subject[]
+  attendance Attendance[]
+  grades     Grade[]
+  timetable  Timetable[]
 
   @@map("schools")
 }
@@ -107,6 +132,10 @@ model Class {
   // Relations
   school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   students Student[]
+  subjects   Subject[]
+  attendance Attendance[]
+  grades     Grade[]
+  timetable  Timetable[]
 
   @@unique([schoolId, name]) // Two classes in the same school cannot share a name
   @@index([schoolId])
@@ -127,6 +156,7 @@ model Teacher {
   // Relations
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timetable Timetable[]
 
   @@index([schoolId])
   @@map("teachers")
@@ -135,7 +165,7 @@ model Teacher {
 model Student {
   id              String   @id @default(uuid())
   schoolId        String
-  userId          String   @unique
+  userId          String   @unique // Each user can only be a student once
   classId         String?
   admissionNumber String
   gender          Gender?
@@ -151,9 +181,117 @@ model Student {
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   class  Class? @relation(fields: [classId], references: [id])
+  attendance Attendance[]
+  grades     Grade[]
 
   @@unique([schoolId, admissionNumber]) // Admission numbers are unique per school
   @@index([schoolId])
   @@index([classId])
   @@map("students")
+}
+
+// ─── Academic Operations ────────────────────────────────────────────
+
+model Subject {
+  id          String   @id @default(uuid())
+  schoolId    String
+  classId     String
+  name        String   // e.g. "Mathematics", "English Language"
+  code        String?  // e.g. "MTH101"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  school     School      @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class      Class       @relation(fields: [classId], references: [id], onDelete: Cascade)
+  grades     Grade[]
+  timetable  Timetable[]
+
+  @@unique([schoolId, classId, name]) // No duplicate subject names within a class
+  @@index([schoolId])
+  @@index([classId])
+  @@map("subjects")
+}
+
+model Attendance {
+  id        String           @id @default(uuid())
+  schoolId  String
+  classId   String
+  studentId String
+  date      DateTime         @db.Date // Date only, no time component
+  status    AttendanceStatus @default(PRESENT)
+  note      String?          // Optional note e.g. "Doctor's appointment"
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  // Relations
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  // A student can only have one attendance record per day per class
+  @@unique([studentId, classId, date])
+  @@index([schoolId])
+  @@index([classId, date])
+  @@index([studentId])
+  @@map("attendance")
+}
+
+model Grade {
+  id           String  @id @default(uuid())
+  schoolId     String
+  studentId    String
+  subjectId    String
+  classId      String
+  term         Term
+  academicYear String  // e.g. "2024/2025"
+
+  // Score breakdown
+  caScore      Float   @default(0) // Continuous Assessment — max 40
+  examScore    Float   @default(0) // Exam — max 60
+  totalScore   Float   @default(0) // Computed: caScore + examScore
+  letterGrade  String  @default("F") // Auto-computed from totalScore
+
+  comment      String?  // Teacher's comment
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student  Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject  Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  class    Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  // One grade record per student per subject per term per year
+  @@unique([studentId, subjectId, term, academicYear])
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([classId, term, academicYear])
+  @@map("grades")
+}
+
+model Timetable {
+  id        String    @id @default(uuid())
+  schoolId  String
+  classId   String
+  subjectId String
+  teacherId String
+  dayOfWeek DayOfWeek
+  startTime String    // "08:00" — stored as HH:MM string, simple and portable
+  endTime   String    // "09:00"
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class   Class   @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  // A class cannot have two subjects at the same time on the same day
+  @@unique([classId, dayOfWeek, startTime])
+  @@index([schoolId])
+  @@index([classId])
+  @@index([teacherId])
+  @@map("timetable")
 }

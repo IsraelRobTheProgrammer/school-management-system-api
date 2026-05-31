@@ -15,6 +15,10 @@ import classRouter from "./modules/class/class.router";
 import teacherRouter from "./modules/teacher/teacher.router";
 import studentRouter from "./modules/student/student.router";
 
+import subjectRouter from "./modules/subject/subject.router";
+import attendanceRouter from "./modules/attendance/attendance.router";
+import gradeRouter from "./modules/grade/grade.router";
+import timetableRouter from "./modules/timetable/timetable.router";
 const app: Express = express();
 
 // ─── Security Middleware ────────────────────────────────────────────────────
@@ -66,7 +70,7 @@ if (env.NODE_ENV !== "test") {
 }
 
 // ─── Health Check ────────────────────────────────────────────────────────────
-app.get("/health", (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "Server is healthy.",
@@ -86,6 +90,10 @@ app.use(`${API_PREFIX}/classes`, classRouter);
 app.use(`${API_PREFIX}/teachers`, teacherRouter);
 app.use(`${API_PREFIX}/students`, studentRouter);
 
+app.use(`${API_PREFIX}/subjects`, subjectRouter);
+app.use(`${API_PREFIX}/attendance`, attendanceRouter);
+app.use(`${API_PREFIX}/grades`, gradeRouter);
+app.use(`${API_PREFIX}/timetable`, timetableRouter);
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {
   sendError({
