@@ -3,10 +3,11 @@ import { gradeController } from "./grade.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
+import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
 const router = Router();
 
-router.use(authenticate, enforceTenant);
+router.use(authenticate, enforceTenant, requireActiveSubscription);
 
 // POST  /api/v1/grades              — Enter/update a grade (upsert)
 // GET   /api/v1/grades              — Query grades (?studentId= &classId= &term= &academicYear=)

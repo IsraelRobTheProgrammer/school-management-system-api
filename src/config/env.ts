@@ -31,6 +31,21 @@ const envSchema = z.object({
 
   // CORS
   ALLOWED_ORIGINS: z.string().default("http://localhost:3000"),
+
+  // Paystack
+  PAYSTACK_SECRET_KEY: z.string({ required_error: "PAYSTACK_SECRET_KEY is required" }),
+  PAYSTACK_PUBLIC_KEY: z.string({ required_error: "PAYSTACK_PUBLIC_KEY is required" }),
+  SMS_BASIC_MONTHLY_PLAN: z.string({ required_error: "SMS_BASIC_MONTHLY_PLAN is required" }),
+  SMS_BASIC_TERMLY_PLAN: z.string({ required_error: "SMS_BASIC_TERMLY_PLAN is required" }),
+  SMS_PREMIUM_MONTHLY_PLAN: z.string({ required_error: "SMS_PREMIUM_MONTHLY_PLAN is required" }),
+  SMS_PREMIUM_TERMLY_PLAN: z.string({ required_error: "SMS_PREMIUM_TERMLY_PLAN is required" }),
+  SMS_BASIC_MONTHLY_AMOUNT: z.coerce.number().default(1000000),
+  SMS_BASIC_TERMLY_AMOUNT: z.coerce.number().default(2700000),
+  SMS_PREMIUM_MONTHLY_AMOUNT: z.coerce.number().default(2500000),
+  SMS_PREMIUM_TERMLY_AMOUNT: z.coerce.number().default(6750000),
+
+  // Frontend
+  FRONTEND_URL: z.string().default("http://localhost:3000"),
 });
 
 // This will throw a clear, descriptive error at startup if any var is missing

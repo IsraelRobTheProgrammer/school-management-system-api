@@ -3,11 +3,12 @@ import { classController } from "./class.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
+import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
 const router = Router();
 
 // All class routes require authentication and tenant context
-router.use(authenticate, enforceTenant);
+router.use(authenticate, enforceTenant, requireActiveSubscription);
 
 // GET    /api/v1/classes       — Admin and Teachers can view
 // POST   /api/v1/classes       — Admin only

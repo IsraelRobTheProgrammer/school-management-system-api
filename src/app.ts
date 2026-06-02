@@ -19,6 +19,10 @@ import subjectRouter from "./modules/subject/subject.router";
 import attendanceRouter from "./modules/attendance/attendance.router";
 import gradeRouter from "./modules/grade/grade.router";
 import timetableRouter from "./modules/timetable/timetable.router";
+
+import billingRouter from "./modules/billing/billing.router";
+import adminRouter from "./modules/admin/admin.router";
+
 const app: Express = express();
 
 // ─── Security Middleware ────────────────────────────────────────────────────
@@ -61,6 +65,9 @@ const authLimiter = rateLimit({
 });
 
 // ─── Request Parsing ────────────────────────────────────────────────────────
+// express.json() is NOT applied to /billing/webhook — that route uses
+// express.raw() internally so Paystack's signature can be verified against
+// the raw bytes. All other routes use JSON parsing normally.
 app.use(express.json({ limit: "10kb" })); // Prevent oversized payloads
 app.use(express.urlencoded({ extended: true }));
 
@@ -84,16 +91,23 @@ app.get("/api/health", (_req, res) => {
 // ─── API Routes ──────────────────────────────────────────────────────────────
 const API_PREFIX = `/api/${env.API_VERSION}`;
 
+// Foundation
 app.use(`${API_PREFIX}/auth`, authLimiter, authRouter);
 app.use(`${API_PREFIX}/schools`, schoolRouter);
 app.use(`${API_PREFIX}/classes`, classRouter);
 app.use(`${API_PREFIX}/teachers`, teacherRouter);
 app.use(`${API_PREFIX}/students`, studentRouter);
 
+// Academic operations
 app.use(`${API_PREFIX}/subjects`, subjectRouter);
 app.use(`${API_PREFIX}/attendance`, attendanceRouter);
 app.use(`${API_PREFIX}/grades`, gradeRouter);
 app.use(`${API_PREFIX}/timetable`, timetableRouter);
+
+// SaaS billing layer and admin
+app.use(`${API_PREFIX}/billing`, billingRouter);
+app.use(`${API_PREFIX}/admin`, adminRouter);
+
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {
   sendError({

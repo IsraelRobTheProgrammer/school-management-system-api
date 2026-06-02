@@ -49,6 +49,24 @@ enum DayOfWeek {
   FRIDAY
 }
 
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingInterval {
+  MONTHLY
+  TERMLY  // Every 3 months
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  FAILED
+}
 // ─── Core Tenant ──────────────────────────────────────────────────────────────
 
 model School {
@@ -74,6 +92,8 @@ model School {
   attendance Attendance[]
   grades     Grade[]
   timetable  Timetable[]
+  subscription  Subscription?
+  invoices      Invoice[]
 
   @@map("schools")
 }
@@ -294,4 +314,53 @@ model Timetable {
   @@index([classId])
   @@index([teacherId])
   @@map("timetable")
+}
+
+// ─── Billing structure ─────────────────────────────────────────────────────────
+
+model Subscription {
+  id                      String             @id @default(uuid())
+  schoolId                String             @unique // One active subscription per school
+  plan                    Plan
+  status                  SubscriptionStatus @default(TRIAL)
+  billingInterval         BillingInterval
+  // Paystack identifiers — stored so we can cancel/query via API
+  paystackSubscriptionCode String?           // SUB_xxxx from Paystack
+  paystackCustomerCode     String?           // CUS_xxxx from Paystack
+  paystackPlanCode         String?           // PLN_xxxx — which plan they subscribed to
+  currentPeriodStart       DateTime?
+  currentPeriodEnd         DateTime?
+  cancelledAt              DateTime?
+  trialEndsAt              DateTime?
+  createdAt                DateTime          @default(now())
+  updatedAt                DateTime          @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id                 String        @id @default(uuid())
+  schoolId           String
+  plan               Plan
+  billingInterval    BillingInterval
+  amountKobo         Int           // Stored in kobo (smallest Paystack unit). ₦10,000 = 1000000 kobo
+  status             InvoiceStatus @default(PENDING)
+  paystackReference  String        @unique // Used for manual verification
+  paystackChannel    String?       // card, bank_transfer, etc.
+  paidAt             DateTime?
+  failureReason      String?
+  periodStart        DateTime?
+  periodEnd          DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([paystackReference])
+  @@index([status])
+  @@map("invoices")
 }

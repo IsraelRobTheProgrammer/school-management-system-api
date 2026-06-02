@@ -3,10 +3,11 @@ import { subjectController } from "./subject.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
+import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
 const router = Router();
 
-router.use(authenticate, enforceTenant);
+router.use(authenticate, enforceTenant, requireActiveSubscription);
 
 router
   .route("/")
