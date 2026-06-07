@@ -84,16 +84,18 @@ model School {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  users    User[]
-  students Student[]
-  teachers Teacher[]
-  classes  Class[]
-  subjects   Subject[]
-  attendance Attendance[]
-  grades     Grade[]
-  timetable  Timetable[]
-  subscription  Subscription?
-  invoices      Invoice[]
+  users          User[]
+  students       Student[]
+  teachers       Teacher[]
+  classes        Class[]
+  subjects       Subject[]
+  attendance     Attendance[]
+  grades         Grade[]
+  timetable      Timetable[]
+  subscription   Subscription?
+  invoices       Invoice[]
+  parentInvites  ParentInvite[]
+  parentStudents ParentStudent[]
 
   @@map("schools")
 }
@@ -118,6 +120,7 @@ model User {
   refreshTokens RefreshToken[]
   teacher       Teacher?
   student       Student?
+  parentStudents ParentStudent[] @relation("ParentStudents")
 
   @@index([schoolId])
   @@index([email])
@@ -203,6 +206,8 @@ model Student {
   class  Class? @relation(fields: [classId], references: [id])
   attendance Attendance[]
   grades     Grade[]
+  parentInvites  ParentInvite[]
+  parentStudents ParentStudent[]
 
   @@unique([schoolId, admissionNumber]) // Admission numbers are unique per school
   @@index([schoolId])
@@ -363,4 +368,42 @@ model Invoice {
   @@index([paystackReference])
   @@index([status])
   @@map("invoices")
+}
+
+// ─── Premium Features (Parent Portal) ─────────────────────────────────────────────────────────
+model ParentInvite {
+  id          String    @id @default(uuid())
+  code        String    @unique // e.g. "INV-A3F9X2" — what the admin shares
+  schoolId    String
+  studentId   String
+  createdById String    // userId of the admin who generated it
+  expiresAt   DateTime  // 7 days from creation
+  usedAt      DateTime? // null = not yet used
+  createdAt   DateTime  @default(now())
+
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([studentId])
+  @@index([code])
+  @@map("parent_invites")
+}
+
+model ParentStudent {
+  id        String @id @default(uuid())
+  parentId  String // parent's user ID.
+  studentId String
+  schoolId  String
+  createdAt DateTime @default(now())
+
+  parent  User    @relation("ParentStudents", fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId]) // A parent can only be linked to a student once
+  @@index([parentId])
+  @@index([studentId])
+  @@index([schoolId])
+  @@map("parent_students")
 }
