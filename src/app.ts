@@ -22,6 +22,7 @@ import timetableRouter from "./modules/timetable/timetable.router";
 
 import billingRouter from "./modules/billing/billing.router";
 import adminRouter from "./modules/admin/admin.router";
+import { mountSwagger } from "./config/swagger";
 
 const app: Express = express();
 
@@ -34,7 +35,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 
 // Global rate limiter — 100 requests per 15 minutes per IP
@@ -59,7 +60,8 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Too many authentication attempts. Please try again in 15 minutes.",
+    message:
+      "Too many authentication attempts. Please try again in 15 minutes.",
     error: { code: "AUTH_RATE_LIMIT_EXCEEDED" },
   },
 });
@@ -108,6 +110,7 @@ app.use(`${API_PREFIX}/timetable`, timetableRouter);
 app.use(`${API_PREFIX}/billing`, billingRouter);
 app.use(`${API_PREFIX}/admin`, adminRouter);
 
+mountSwagger(app);
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {
   sendError({
