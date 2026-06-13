@@ -38,6 +38,9 @@ importers:
       pdfkit:
         specifier: ^0.18.0
         version: 0.18.0
+      prisma:
+        specifier: ^5.13.0
+        version: 5.22.0
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.22.2)
@@ -87,9 +90,6 @@ importers:
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
-      prisma:
-        specifier: ^5.13.0
-        version: 5.22.0
       tsx:
         specifier: ^4.8.2
         version: 4.22.4
