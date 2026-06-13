@@ -55,4 +55,4 @@ USER appuser
 EXPOSE 5000
 
 # Run migrations, then start the server
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy; echo \"Prisma exited with code $?\"; node dist/server.js"]
