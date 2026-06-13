@@ -49,4 +49,4 @@ USER appuser
 EXPOSE 5000
 
 # Run migrations, then start the server
-CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/server.js"]
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/server.js"]
