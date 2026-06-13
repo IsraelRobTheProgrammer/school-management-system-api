@@ -66,7 +66,12 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Deploy to Railway
-        run: railway up --service school-ms-api --detach
+        run: |
+          for i in 1 2 3; do
+            railway up --service school-ms-api --detach && break
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
