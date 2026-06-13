@@ -7,12 +7,11 @@ RUN npm install -g pnpm
 
 WORKDIR /app
 
-# Copy package files first — Docker layer caching means pnpm install
-# only re-runs when package.json or lockfile changes, not on every code change
+# Copy schema / config files first
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma
 
-# Install ALL dependencies (including devDependencies — needed for tsc)
+# Install ALL dependencies (needed for tsc)
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client
@@ -23,33 +22,31 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN pnpm build
 
+# Prune devDependencies after building, leaving only production modules
+# This preserves the exact .prisma structure generated in node_modules
+RUN pnpm prune --prod
+
 # ─── Stage 2: Runner ──────────────────────────────────────────────────────────
 # Copy only what's needed to run — no TypeScript, no devDependencies
 FROM node:20-alpine AS runner
 
-RUN npm install -g pnpm
-
 WORKDIR /app
 
-# Copy package files and install PRODUCTION dependencies only
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
-
-# Copy compiled output from builder stage
-COPY --from=builder /app/dist ./dist
-
-# Copy Prisma schema and generated client
-# The client is in node_modules but schema is needed for migrate deploy
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY prisma ./prisma
-
-# Don't run as root — security best practice
+# Non-root user setup (ensure proper permissions)
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
 
+# Copy package files (needed for runtime metadata, scripts)
+COPY package.json ./
+
+# Copy the pre-pruned, production-ready node_modules from builder stage
+COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+
+# Copy compiled output and Prisma configurations
+COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
+COPY --from=builder --chown=appuser:appgroup /app/prisma ./prisma
+
+USER appuser
 EXPOSE 5000
 
-# Run migrations first, then start the server
-# prisma migrate deploy is safe to run on every startup — it's idempotent
+# Run migrations, then start the server
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
