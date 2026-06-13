@@ -8,7 +8,7 @@ import {
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const gradeController: Controller = {
   upsert: asyncHandler(async (req: Request, res: Response) => {
@@ -55,7 +55,7 @@ export const gradeController: Controller = {
       throw new AppError(
         "term and academicYear query params are required.",
         400,
-        "MISSING_PARAMS",
+        "MISSING_PARAMS"
       );
     }
 
@@ -63,7 +63,7 @@ export const gradeController: Controller = {
       req.schoolId,
       studentId,
       term,
-      academicYear,
+      academicYear
     );
     sendSuccess({
       res,
@@ -84,7 +84,7 @@ export const gradeController: Controller = {
       throw new AppError(
         "term and academicYear query params are required.",
         400,
-        "MISSING_PARAMS",
+        "MISSING_PARAMS"
       );
     }
 
@@ -92,7 +92,7 @@ export const gradeController: Controller = {
       req.schoolId,
       classId,
       term,
-      academicYear,
+      academicYear
     );
     sendSuccess({
       res,

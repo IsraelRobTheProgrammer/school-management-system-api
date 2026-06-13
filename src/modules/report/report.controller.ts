@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { reportService } from "./report.service";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const reportController: Controller = {
   /**
@@ -23,7 +23,7 @@ export const reportController: Controller = {
       throw new AppError(
         "term and academicYear query params are required",
         400,
-        "MISSING_PARAMS",
+        "MISSING_PARAMS"
       );
     }
 
@@ -31,7 +31,7 @@ export const reportController: Controller = {
       throw new AppError(
         "term must be FIRST, SECOND or THIRD.",
         400,
-        "INVALID_TERM",
+        "INVALID_TERM"
       );
     }
 
@@ -39,11 +39,14 @@ export const reportController: Controller = {
       req.schoolId,
       studentId,
       term as "FIRST" | "SECOND" | "THIRD",
-      academicYear,
+      academicYear
     );
 
     // Filename: "report-card-FIRST-2024-2025.pdf"
-    const filename = `report-card-${term}-${academicYear.replace("/", "-")}.pdf`;
+    const filename = `report-card-${term}-${academicYear.replace(
+      "/",
+      "-"
+    )}.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);

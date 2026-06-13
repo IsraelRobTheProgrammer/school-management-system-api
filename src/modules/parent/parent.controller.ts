@@ -5,7 +5,7 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
 import { parentService } from "./parent.service";
 import { registerParentSchema } from "./parent.schema";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const parentController: Controller = {
   // ── Admin actions ──────────────────────────────────────────────────────────
@@ -17,7 +17,7 @@ export const parentController: Controller = {
     const result = await parentService.getInviteCode(
       req.schoolId,
       req.params.studentId,
-      req.user.userId,
+      req.user.userId
     );
 
     sendSuccess({
@@ -57,7 +57,7 @@ export const parentController: Controller = {
 
     const students = await parentService.getMyStudents(
       req.user.userId,
-      req.schoolId,
+      req.schoolId
     );
     sendSuccess({
       res,
@@ -80,7 +80,7 @@ export const parentController: Controller = {
       throw new AppError(
         "term and academicYear query params are required.",
         400,
-        "MISSING_PARAMS",
+        "MISSING_PARAMS"
       );
     }
 
@@ -89,7 +89,7 @@ export const parentController: Controller = {
       req.schoolId,
       studentId,
       term,
-      academicYear,
+      academicYear
     );
 
     sendSuccess({ res, message: "Report fetched successfully.", data: report });
@@ -102,7 +102,7 @@ export const parentController: Controller = {
     const attendance = await parentService.getStudentAttendance(
       req.user.userId,
       req.schoolId,
-      req.params.studentId,
+      req.params.studentId
     );
 
     sendSuccess({

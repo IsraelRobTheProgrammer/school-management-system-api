@@ -5,7 +5,7 @@ import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 import { enforceTenant } from "@/middlewares/tenant.middleware";
 import { reportController } from "./report.controller";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -21,7 +21,7 @@ router.get(
   "/pdf/:studentId",
   authorize("SCHOOL_ADMIN", "TEACHER"),
   requirePlan("PREMIUM"),
-  reportController.downloadReportCard,
+  reportController.downloadReportCard
 );
 
 export default router;

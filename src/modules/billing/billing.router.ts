@@ -4,7 +4,7 @@ import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -19,7 +19,7 @@ const router = createRouter();
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
-  billingController.webhook,
+  billingController.webhook
 );
 
 // All other billing routes require authentication
@@ -29,21 +29,21 @@ router.use(authenticate, enforceTenant);
 router.post(
   "/initialize",
   authorize("SCHOOL_ADMIN"),
-  billingController.initialize,
+  billingController.initialize
 );
 
 // POST /api/v1/billing/verify/:reference  — Manual payment check
 router.post(
   "/verify/:reference",
   authorize("SCHOOL_ADMIN"),
-  billingController.verify,
+  billingController.verify
 );
 
 // GET  /api/v1/billing/subscription  — Current subscription status + invoice history
 router.get(
   "/subscription",
   authorize("SCHOOL_ADMIN"),
-  billingController.getStatus,
+  billingController.getStatus
 );
 
 // POST /api/v1/billing/cancel  — Cancel subscription

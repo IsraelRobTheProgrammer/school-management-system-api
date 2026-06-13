@@ -4,7 +4,7 @@ import { initializeSubscriptionSchema } from "./billing.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const billingController: Controller = {
   initialize: asyncHandler(async (req: Request, res: Response) => {
@@ -15,7 +15,7 @@ export const billingController: Controller = {
     const result = await billingService.initializeSubscription(
       req.schoolId,
       req.user.email,
-      body,
+      body
     );
 
     sendSuccess({
@@ -57,7 +57,7 @@ export const billingController: Controller = {
 
     const result = await billingService.verifyPayment(
       req.schoolId,
-      req.params.reference,
+      req.params.reference
     );
 
     sendSuccess({ res, message: result.message, data: result });

@@ -2,7 +2,7 @@ import { AppError } from "@/utils/AppError";
 import { Request, Response } from "express";
 import { exportService } from "./export.service";
 import { asyncHandler } from "@/utils/asyncHandler";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 /**
  * Sets the correct headers for a CSV download response.

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { adminService } from "./admin.service";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const adminController: Controller = {
   getDashboard: asyncHandler(async (_req: Request, res: Response) => {

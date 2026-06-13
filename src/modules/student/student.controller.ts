@@ -4,7 +4,7 @@ import { createStudentSchema, updateStudentSchema } from "./student.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const studentController: Controller = {
   create: asyncHandler(async (req: Request, res: Response) => {
@@ -47,7 +47,7 @@ export const studentController: Controller = {
     const student = await studentService.update(
       req.schoolId,
       req.params.id,
-      body,
+      body
     );
     sendSuccess({
       res,

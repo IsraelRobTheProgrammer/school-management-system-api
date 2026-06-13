@@ -4,7 +4,7 @@ import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -21,14 +21,14 @@ router
 router.get(
   "/report/student/:studentId",
   authorize("SCHOOL_ADMIN", "TEACHER", "STUDENT", "PARENT"),
-  gradeController.getStudentReport,
+  gradeController.getStudentReport
 );
 
 // GET   /api/v1/grades/report/class/:classId?term=FIRST&academicYear=2024/2025
 router.get(
   "/report/class/:classId",
   authorize("SCHOOL_ADMIN", "TEACHER"),
-  gradeController.getClassReport,
+  gradeController.getClassReport
 );
 
 // GET   /api/v1/grades/:id          — Single grade record

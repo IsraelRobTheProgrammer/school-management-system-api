@@ -8,7 +8,7 @@ import {
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const attendanceController: Controller = {
   record: asyncHandler(async (req: Request, res: Response) => {
@@ -40,7 +40,7 @@ export const attendanceController: Controller = {
     const record = await attendanceService.update(
       req.schoolId,
       req.params.id,
-      body,
+      body
     );
     sendSuccess({
       res,
@@ -54,7 +54,7 @@ export const attendanceController: Controller = {
     const { studentId } = req.params;
     const summary = await attendanceService.getStudentSummary(
       req.schoolId,
-      studentId,
+      studentId
     );
     sendSuccess({
       res,

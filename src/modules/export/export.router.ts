@@ -4,7 +4,7 @@ import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 import { enforceTenant } from "@/middlewares/tenant.middleware";
 import { exportController } from "./export.controller";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -20,13 +20,13 @@ router.use(authenticate, enforceTenant, requireActiveSubscription);
 router.get(
   "/attendance",
   authorize("SCHOOL_ADMIN", "TEACHER"),
-  exportController.attendance,
+  exportController.attendance
 );
 
 router.get(
   "/grades",
   authorize("SCHOOL_ADMIN", "TEACHER"),
-  exportController.grades,
+  exportController.grades
 );
 
 export default router;

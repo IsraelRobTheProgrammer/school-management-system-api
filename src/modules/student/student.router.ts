@@ -4,7 +4,7 @@ import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -23,7 +23,7 @@ router
 router.patch(
   "/:id/deactivate",
   authorize("SCHOOL_ADMIN"),
-  studentController.deactivate,
+  studentController.deactivate
 );
 
 export default router;

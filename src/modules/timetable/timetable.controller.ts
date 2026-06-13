@@ -7,7 +7,7 @@ import {
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/expressUtils";
+import { Controller } from "../../types/express";
 
 export const timetableController: Controller = {
   create: asyncHandler(async (req: Request, res: Response) => {
@@ -26,7 +26,7 @@ export const timetableController: Controller = {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
     const timetable = await timetableService.getClassTimetable(
       req.schoolId,
-      req.params.classId,
+      req.params.classId
     );
     sendSuccess({
       res,
@@ -39,7 +39,7 @@ export const timetableController: Controller = {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
     const timetable = await timetableService.getTeacherTimetable(
       req.schoolId,
-      req.params.teacherId,
+      req.params.teacherId
     );
     sendSuccess({
       res,
@@ -54,7 +54,7 @@ export const timetableController: Controller = {
     const entry = await timetableService.update(
       req.schoolId,
       req.params.id,
-      body,
+      body
     );
     sendSuccess({
       res,

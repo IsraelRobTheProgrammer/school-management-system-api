@@ -4,7 +4,7 @@ import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -17,14 +17,14 @@ router.post("/", authorize("SCHOOL_ADMIN"), timetableController.create);
 router.get(
   "/class/:classId",
   authorize("SCHOOL_ADMIN", "TEACHER", "STUDENT"),
-  timetableController.getClassTimetable,
+  timetableController.getClassTimetable
 );
 
 // GET  /api/v1/timetable/teacher/:teacherId — Full weekly schedule for a teacher
 router.get(
   "/teacher/:teacherId",
   authorize("SCHOOL_ADMIN", "TEACHER"),
-  timetableController.getTeacherTimetable,
+  timetableController.getTeacherTimetable
 );
 
 // PATCH  /api/v1/timetable/:id        — Update an entry (change teacher or time)

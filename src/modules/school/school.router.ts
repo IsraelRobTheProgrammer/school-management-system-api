@@ -3,7 +3,7 @@ import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 
-import { createRouter } from "@/types/expressUtils";
+import { createRouter } from "../../types/express";
 
 const router = createRouter();
 
@@ -12,7 +12,7 @@ router.get(
   "/all",
   authenticate,
   authorize("SUPER_ADMIN"),
-  schoolController.getAllSchools,
+  schoolController.getAllSchools
 );
 
 // GET   /api/v1/schools/profile  — current school's profile
