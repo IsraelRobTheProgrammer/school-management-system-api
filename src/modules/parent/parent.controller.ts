@@ -5,7 +5,7 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
 import { parentService } from "./parent.service";
 import { registerParentSchema } from "./parent.schema";
-import { Controller } from "@/types/express";
+import { Controller } from "@/types/expressUtils";
 
 export const parentController: Controller = {
   // ── Admin actions ──────────────────────────────────────────────────────────

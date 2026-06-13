@@ -4,7 +4,7 @@ import { initializeSubscriptionSchema } from "./billing.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/express";
+import { Controller } from "@/types/expressUtils";
 
 export const billingController: Controller = {
   initialize: asyncHandler(async (req: Request, res: Response) => {

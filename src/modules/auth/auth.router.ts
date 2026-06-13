@@ -1,6 +1,7 @@
+import { createRouter } from "@/types/expressUtils";
 import { authController } from "./auth.controller";
 
-import { createRouter } from "@/types/express";
+// import { createRouter } from "@/types/expressUtil";
 
 const router = createRouter();
 

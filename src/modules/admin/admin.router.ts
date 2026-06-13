@@ -1,7 +1,7 @@
 import { adminController } from "./admin.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
-import { createRouter } from "@/types/express";
+import { createRouter } from "@/types/expressUtils";
 
 const router = createRouter();
 

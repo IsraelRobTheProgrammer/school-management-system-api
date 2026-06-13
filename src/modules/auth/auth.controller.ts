@@ -7,7 +7,7 @@ import {
 } from "./auth.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { Controller } from "@/types/express";
+import { Controller } from "@/types/expressUtils";
 
 export const authController: Controller = {
   register: asyncHandler(async (req: Request, res: Response) => {

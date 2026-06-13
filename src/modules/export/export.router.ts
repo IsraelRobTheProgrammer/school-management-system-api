@@ -4,7 +4,7 @@ import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 import { enforceTenant } from "@/middlewares/tenant.middleware";
 import { exportController } from "./export.controller";
 
-import { createRouter } from "@/types/express";
+import { createRouter } from "@/types/expressUtils";
 
 const router = createRouter();
 

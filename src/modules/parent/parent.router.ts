@@ -5,7 +5,7 @@ import { enforceTenant } from "@/middlewares/tenant.middleware";
 import { requirePlan } from "@/middlewares/plan.guard";
 import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 
-import { createRouter } from "@/types/express";
+import { createRouter } from "@/types/expressUtils";
 
 const router = createRouter();
 

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { reportService } from "./report.service";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
-import { Controller } from "@/types/express";
+import { Controller } from "@/types/expressUtils";
 
 export const reportController: Controller = {
   /**

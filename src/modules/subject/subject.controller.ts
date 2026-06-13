@@ -4,7 +4,7 @@ import { createSubjectSchema, updateSubjectSchema } from "./subject.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
-import { Controller } from "@/types/express";
+import { Controller } from "@/types/expressUtils";
 
 export const subjectController: Controller = {
   create: asyncHandler(async (req: Request, res: Response) => {
