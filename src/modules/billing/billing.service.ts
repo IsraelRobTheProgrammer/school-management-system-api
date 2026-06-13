@@ -15,9 +15,12 @@ import crypto from "crypto";
  */
 const getPlanConfig = (
   plan: Plan,
-  interval: BillingInterval
+  interval: BillingInterval,
 ): { paystackPlanCode: string; amountKobo: number } => {
-  const configs: Record<string, { paystackPlanCode: string; amountKobo: number }> = {
+  const configs: Record<
+    string,
+    { paystackPlanCode: string; amountKobo: number }
+  > = {
     BASIC_MONTHLY: {
       paystackPlanCode: env.SMS_BASIC_MONTHLY_PLAN,
       amountKobo: env.SMS_BASIC_MONTHLY_AMOUNT,
@@ -57,12 +60,12 @@ export const billingService = {
   async initializeSubscription(
     schoolId: string,
     adminEmail: string,
-    input: InitializeSubscriptionInput
+    input: InitializeSubscriptionInput,
   ) {
     const { plan, billingInterval } = input;
     const { paystackPlanCode, amountKobo } = getPlanConfig(
       plan as Plan,
-      billingInterval as BillingInterval
+      billingInterval as BillingInterval,
     );
 
     // Generate a unique reference we can track
@@ -91,7 +94,11 @@ export const billingService = {
         plan,
         billingInterval,
         custom_fields: [
-          { display_name: "School ID", variable_name: "school_id", value: schoolId },
+          {
+            display_name: "School ID",
+            variable_name: "school_id",
+            value: schoolId,
+          },
           { display_name: "Plan", variable_name: "plan", value: plan },
         ],
       },
@@ -122,7 +129,10 @@ export const billingService = {
     }
 
     if (invoice.status === "PAID") {
-      return { alreadyPaid: true, message: "This payment has already been processed." };
+      return {
+        alreadyPaid: true,
+        message: "This payment has already been processed.",
+      };
     }
 
     // Ask Paystack for the truth
@@ -132,7 +142,7 @@ export const billingService = {
       throw new AppError(
         `Payment was not successful. Status: ${transaction.status}`,
         402,
-        "PAYMENT_NOT_SUCCESSFUL"
+        "PAYMENT_NOT_SUCCESSFUL",
       );
     }
 
@@ -143,6 +153,7 @@ export const billingService = {
       plan: invoice.plan,
       billingInterval: invoice.billingInterval,
       amountKobo: transaction.amount,
+      expectedPay: invoice.amountKobo,
       paystackCustomerCode: transaction.customer.customer_code,
       paystackSubscriptionCode: transaction.subscription?.subscription_code,
       paystackPlanCode: transaction.plan?.plan_code,
@@ -150,7 +161,10 @@ export const billingService = {
       paidAt: new Date(transaction.paid_at),
     });
 
-    return { alreadyPaid: false, message: "Payment verified and subscription activated." };
+    return {
+      alreadyPaid: false,
+      message: "Payment verified and subscription activated.",
+    };
   },
 
   /**
@@ -164,6 +178,7 @@ export const billingService = {
     plan: Plan;
     billingInterval: BillingInterval;
     amountKobo: number;
+    expectedPay: number;
     paystackCustomerCode?: string;
     paystackSubscriptionCode?: string;
     paystackPlanCode?: string;
@@ -171,10 +186,26 @@ export const billingService = {
     paidAt: Date;
   }) {
     const {
-      schoolId, reference, plan, billingInterval,
-      amountKobo, paystackCustomerCode, paystackSubscriptionCode,
-      paystackPlanCode, channel, paidAt,
+      schoolId,
+      reference,
+      plan,
+      billingInterval,
+      amountKobo,
+      expectedPay,
+      paystackCustomerCode,
+      paystackSubscriptionCode,
+      paystackPlanCode,
+      channel,
+      paidAt,
     } = params;
+
+    if (amountKobo !== expectedPay) {
+      throw new AppError(
+        "Invalid amount paid for plan.",
+        400,
+        "INVALID_PAYMENT",
+      );
+    }
 
     // Calculate period dates
     const periodStart = new Date(paidAt);
@@ -241,7 +272,11 @@ export const billingService = {
   async handleWebhook(rawBody: Buffer, signature: string) {
     // Verify authenticity — reject anything that doesn't match
     if (!verifyWebhookSignature(rawBody, signature)) {
-      throw new AppError("Invalid webhook signature.", 401, "INVALID_SIGNATURE");
+      throw new AppError(
+        "Invalid webhook signature.",
+        401,
+        "INVALID_SIGNATURE",
+      );
     }
 
     const event = JSON.parse(rawBody.toString()) as {
@@ -277,6 +312,7 @@ export const billingService = {
           plan: invoice.plan,
           billingInterval: invoice.billingInterval,
           amountKobo: data.amount,
+          expectedPay: invoice.amountKobo,
           paystackCustomerCode: data.customer.customer_code,
           paystackSubscriptionCode: data.subscription?.subscription_code,
           paystackPlanCode: data.plan?.plan_code,
@@ -315,9 +351,13 @@ export const billingService = {
       }
 
       case "invoice.payment_failed": {
-        const data = event.data as { subscription: { subscription_code: string } };
+        const data = event.data as {
+          subscription: { subscription_code: string };
+        };
         await prisma.subscription.updateMany({
-          where: { paystackSubscriptionCode: data.subscription.subscription_code },
+          where: {
+            paystackSubscriptionCode: data.subscription.subscription_code,
+          },
           data: { status: "PAST_DUE" },
         });
         break;
@@ -333,7 +373,9 @@ export const billingService = {
         };
 
         const sub = await prisma.subscription.findFirst({
-          where: { paystackSubscriptionCode: data.subscription.subscription_code },
+          where: {
+            paystackSubscriptionCode: data.subscription.subscription_code,
+          },
         });
 
         if (sub) {
@@ -407,7 +449,11 @@ export const billingService = {
     }
 
     if (subscription.status === "CANCELLED") {
-      throw new AppError("Subscription is already cancelled.", 400, "ALREADY_CANCELLED");
+      throw new AppError(
+        "Subscription is already cancelled.",
+        400,
+        "ALREADY_CANCELLED",
+      );
     }
 
     // Mark as cancelled in our DB immediately
@@ -423,6 +469,9 @@ export const billingService = {
       data: { plan: "BASIC" },
     });
 
-    return { message: "Subscription cancelled. Your access will continue until the end of the current billing period." };
+    return {
+      message:
+        "Subscription cancelled. Your access will continue until the end of the current billing period.",
+    };
   },
 };

@@ -1,9 +1,12 @@
 import { prisma } from "../../config/database";
 import { hashPassword, comparePassword } from "../../utils/hash";
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from "../../utils/jwt";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "../../utils/jwt";
 import { AppError } from "../../utils/AppError";
 import { RegisterSchoolInput, LoginInput } from "./auth.schema";
-import crypto from "crypto";
 
 export const authService = {
   /**
@@ -12,8 +15,15 @@ export const authService = {
    */
   async register(input: RegisterSchoolInput) {
     const {
-      schoolName, subdomain, schoolEmail, schoolPhone, address,
-      firstName, lastName, adminEmail, password,
+      schoolName,
+      subdomain,
+      schoolEmail,
+      schoolPhone,
+      address,
+      firstName,
+      lastName,
+      adminEmail,
+      password,
     } = input;
 
     // Check subdomain uniqueness before starting transaction
@@ -24,7 +34,7 @@ export const authService = {
       throw new AppError(
         `The subdomain "${subdomain}" is already taken. Please choose another.`,
         409,
-        "SUBDOMAIN_TAKEN"
+        "SUBDOMAIN_TAKEN",
       );
     }
 
@@ -36,7 +46,7 @@ export const authService = {
       throw new AppError(
         "An account with this email already exists.",
         409,
-        "EMAIL_TAKEN"
+        "EMAIL_TAKEN",
       );
     }
 
@@ -128,7 +138,7 @@ export const authService = {
       throw new AppError(
         "Invalid email or password.",
         401,
-        "INVALID_CREDENTIALS"
+        "INVALID_CREDENTIALS",
       );
     }
 
@@ -136,7 +146,7 @@ export const authService = {
       throw new AppError(
         "Your account has been deactivated. Please contact your administrator.",
         403,
-        "ACCOUNT_DEACTIVATED"
+        "ACCOUNT_DEACTIVATED",
       );
     }
 
@@ -144,7 +154,7 @@ export const authService = {
       throw new AppError(
         "Your school's account has been suspended. Please contact support.",
         403,
-        "SCHOOL_SUSPENDED"
+        "SCHOOL_SUSPENDED",
       );
     }
 
@@ -189,14 +199,13 @@ export const authService = {
    */
   async refresh(refreshToken: string) {
     // Verify the token is cryptographically valid first
-    let payload;
     try {
-      payload = verifyRefreshToken(refreshToken);
+      verifyRefreshToken(refreshToken);
     } catch {
       throw new AppError(
         "Invalid or expired refresh token. Please log in again.",
         401,
-        "REFRESH_TOKEN_INVALID"
+        "REFRESH_TOKEN_INVALID",
       );
     }
 
@@ -210,7 +219,7 @@ export const authService = {
       throw new AppError(
         "Refresh token not found or expired. Please log in again.",
         401,
-        "REFRESH_TOKEN_EXPIRED"
+        "REFRESH_TOKEN_EXPIRED",
       );
     }
 

@@ -15,11 +15,11 @@ import { isDevelopment } from "../config/env";
  */
 export const errorMiddleware = (
   err: Error,
-  req: Request,
+  _req: Request,
   res: Response,
   // next MUST be declared even if unused — Express requires 4-param signature
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _next: NextFunction
+  _next: NextFunction,
 ): void => {
   // Log every error in development, only unexpected ones in production
   if (isDevelopment || !(err instanceof AppError)) {

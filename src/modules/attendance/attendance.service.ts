@@ -32,7 +32,7 @@ export const attendanceService = {
       throw new AppError(
         "One or more students do not belong to this class.",
         400,
-        "INVALID_STUDENTS"
+        "INVALID_STUDENTS",
       );
     }
 
@@ -60,7 +60,7 @@ export const attendanceService = {
           status: record.status,
           note: record.note,
         },
-      })
+      }),
     );
 
     const results = await prisma.$transaction(upserts);
@@ -90,14 +90,13 @@ export const attendanceService = {
       throw new AppError(
         "Please provide at least classId or studentId as a query parameter.",
         400,
-        "MISSING_FILTER"
+        "MISSING_FILTER",
       );
     }
 
-    const dateFilter =
-      date
-        ? { date: new Date(date) }
-        : startDate && endDate
+    const dateFilter = date
+      ? { date: new Date(date) }
+      : startDate && endDate
         ? { date: { gte: new Date(startDate), lte: new Date(endDate) } }
         : {};
 
@@ -126,11 +125,16 @@ export const attendanceService = {
    * Update a single attendance record by ID.
    * Teachers can correct a wrong status after submission.
    */
-  async update(schoolId: string, attendanceId: string, input: UpdateAttendanceInput) {
+  async update(
+    schoolId: string,
+    attendanceId: string,
+    input: UpdateAttendanceInput,
+  ) {
     const record = await prisma.attendance.findFirst({
       where: { id: attendanceId, schoolId },
     });
-    if (!record) throw new AppError("Attendance record not found.", 404, "NOT_FOUND");
+    if (!record)
+      throw new AppError("Attendance record not found.", 404, "NOT_FOUND");
 
     return prisma.attendance.update({
       where: { id: attendanceId },
@@ -145,8 +149,8 @@ export const attendanceService = {
   async getStudentSummary(
     schoolId: string,
     studentId: string,
-    academicYear?: string,
-    term?: string
+    // academicYear?: string,
+    // term?: string
   ) {
     // Verify student belongs to this school
     const student = await prisma.student.findFirst({
