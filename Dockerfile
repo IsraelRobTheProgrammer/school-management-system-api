@@ -2,6 +2,9 @@
 # Install all dependencies and compile TypeScript to JavaScript
 FROM node:20-alpine AS builder
 
+# Install OpenSSL and libc compatibility for Prisma engines
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
 # Install pnpm
 RUN npm install -g pnpm
 
@@ -29,6 +32,9 @@ RUN pnpm prune --prod
 # ─── Stage 2: Runner ──────────────────────────────────────────────────────────
 # Copy only what's needed to run — no TypeScript, no devDependencies
 FROM node:20-alpine AS runner
+
+# Install OpenSSL and libc compatibility for runtime engines can use
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 
 WORKDIR /app
 
