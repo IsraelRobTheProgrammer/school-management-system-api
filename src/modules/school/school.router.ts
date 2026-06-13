@@ -1,17 +1,18 @@
-import { Router } from "express";
 import { schoolController } from "./school.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 // GET  /api/v1/schools/all   — SUPER_ADMIN: all tenants (no enforceTenant)
 router.get(
   "/all",
   authenticate,
   authorize("SUPER_ADMIN"),
-  schoolController.getAllSchools
+  schoolController.getAllSchools,
 );
 
 // GET   /api/v1/schools/profile  — current school's profile

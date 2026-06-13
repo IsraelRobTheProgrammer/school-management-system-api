@@ -2,6 +2,7 @@ import { AppError } from "@/utils/AppError";
 import { Request, Response } from "express";
 import { exportService } from "./export.service";
 import { asyncHandler } from "@/utils/asyncHandler";
+import { Controller } from "@/types/express";
 
 /**
  * Sets the correct headers for a CSV download response.
@@ -13,7 +14,7 @@ const sendCsv = (res: Response, csv: string, filename: string): void => {
   res.send("\uFEFF" + csv);
 };
 
-export const exportController = {
+export const exportController: Controller = {
   attendance: asyncHandler(async (req: Request, res: Response) => {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
 

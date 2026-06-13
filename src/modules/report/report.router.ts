@@ -3,10 +3,11 @@ import { requirePlan } from "@/middlewares/plan.guard";
 import { authorize } from "@/middlewares/rbac.middleware";
 import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 import { enforceTenant } from "@/middlewares/tenant.middleware";
-import { Router } from "express";
 import { reportController } from "./report.controller";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 router.use(authenticate, enforceTenant, requireActiveSubscription);
 

@@ -1,4 +1,3 @@
-import { Router } from "express";
 import { parentController } from "./parent.controller";
 import { authenticate } from "@/middlewares/auth.middleware";
 import { authorize } from "@/middlewares/rbac.middleware";
@@ -6,7 +5,9 @@ import { enforceTenant } from "@/middlewares/tenant.middleware";
 import { requirePlan } from "@/middlewares/plan.guard";
 import { requireActiveSubscription } from "@/middlewares/subscription.guard";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 /**
  * PUBLIC — no auth needed.

@@ -1,9 +1,9 @@
-import { Router } from "express";
 import { adminController } from "./admin.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
+import { createRouter } from "@/types/express";
 
-const router = Router();
+const router = createRouter();
 
 /**
  * All admin routes are SUPER_ADMIN only.

@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import { reportService } from "./report.service";
 import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
+import { Controller } from "@/types/express";
 
-export const reportController = {
+export const reportController: Controller = {
   /**
    * Streams the PDF directly to the response.
    * The browser receives it with the correct headers and triggers a download.

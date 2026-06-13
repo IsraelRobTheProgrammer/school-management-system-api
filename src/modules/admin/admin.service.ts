@@ -105,14 +105,14 @@ export const adminService = {
           acc[item.plan] = item._count.plan;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
       subscriptionBreakdown: subscriptionBreakdown.reduce(
         (acc, item) => {
           acc[item.status] = item._count.status;
           return acc;
         },
-        {} as Record<string, number>
+        {} as Record<string, number>,
       ),
       recentSignups,
     };
@@ -214,7 +214,10 @@ export const adminService = {
       });
 
       results.push({
-        month: start.toLocaleString("default", { month: "short", year: "numeric" }),
+        month: start.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        }),
         revenueNaira: (revenue._sum.amountKobo ?? 0) / 100,
         invoiceCount: revenue._count,
       });

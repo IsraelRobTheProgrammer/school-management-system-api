@@ -1,11 +1,12 @@
-import { Router } from "express";
 import { classController } from "./class.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 // All class routes require authentication and tenant context
 router.use(authenticate, enforceTenant, requireActiveSubscription);

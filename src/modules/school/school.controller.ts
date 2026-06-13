@@ -4,8 +4,9 @@ import { updateSchoolSchema } from "./school.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
+import { Controller } from "@/types/express";
 
-export const schoolController = {
+export const schoolController: Controller = {
   getProfile: asyncHandler(async (req: Request, res: Response) => {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
     const school = await schoolService.getProfile(req.schoolId);

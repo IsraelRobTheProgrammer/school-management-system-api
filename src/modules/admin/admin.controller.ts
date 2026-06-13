@@ -2,8 +2,9 @@ import { Request, Response } from "express";
 import { adminService } from "./admin.service";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { Controller } from "@/types/express";
 
-export const adminController = {
+export const adminController: Controller = {
   getDashboard: asyncHandler(async (_req: Request, res: Response) => {
     const dashboard = await adminService.getDashboard();
     sendSuccess({ res, message: "Dashboard data fetched.", data: dashboard });
@@ -13,7 +14,11 @@ export const adminController = {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const result = await adminService.getAllSchools(page, limit);
-    sendSuccess({ res, message: "Schools fetched successfully.", data: result });
+    sendSuccess({
+      res,
+      message: "Schools fetched successfully.",
+      data: result,
+    });
   }),
 
   toggleSchoolStatus: asyncHandler(async (req: Request, res: Response) => {

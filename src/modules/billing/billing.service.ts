@@ -432,7 +432,7 @@ export const billingService = {
             cancelledAt: subscription.cancelledAt,
           }
         : null,
-      recentInvoices: recentInvoices.map((inv) => ({
+      recentInvoices: recentInvoices.map((inv: any) => ({
         ...inv,
         amountNaira: inv.amountKobo / 100,
       })),

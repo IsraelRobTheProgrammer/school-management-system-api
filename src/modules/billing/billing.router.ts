@@ -1,11 +1,12 @@
-import { Router } from "express";
 import express from "express";
 import { billingController } from "./billing.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 /**
  * NB: The webhook route uses express.raw() — not express.json().
@@ -18,7 +19,7 @@ const router = Router();
 router.post(
   "/webhook",
   express.raw({ type: "application/json" }),
-  billingController.webhook
+  billingController.webhook,
 );
 
 // All other billing routes require authentication
@@ -28,28 +29,24 @@ router.use(authenticate, enforceTenant);
 router.post(
   "/initialize",
   authorize("SCHOOL_ADMIN"),
-  billingController.initialize
+  billingController.initialize,
 );
 
 // POST /api/v1/billing/verify/:reference  — Manual payment check
 router.post(
   "/verify/:reference",
   authorize("SCHOOL_ADMIN"),
-  billingController.verify
+  billingController.verify,
 );
 
 // GET  /api/v1/billing/subscription  — Current subscription status + invoice history
 router.get(
   "/subscription",
   authorize("SCHOOL_ADMIN"),
-  billingController.getStatus
+  billingController.getStatus,
 );
 
 // POST /api/v1/billing/cancel  — Cancel subscription
-router.post(
-  "/cancel",
-  authorize("SCHOOL_ADMIN"),
-  billingController.cancel
-);
+router.post("/cancel", authorize("SCHOOL_ADMIN"), billingController.cancel);
 
 export default router;

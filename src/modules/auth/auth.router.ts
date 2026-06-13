@@ -1,7 +1,8 @@
-import { Router } from "express";
 import { authController } from "./auth.controller";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 // POST /api/v1/auth/register  — School onboarding
 router.post("/register", authController.register);

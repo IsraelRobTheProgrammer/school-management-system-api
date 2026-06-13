@@ -53,7 +53,7 @@ export const authService = {
     const passwordHash = await hashPassword(password);
 
     // Transaction: both school and user are created together or not at all
-    const { school, user } = await prisma.$transaction(async (tx) => {
+    const { school, user } = await prisma.$transaction(async (tx: any) => {
       const school = await tx.school.create({
         data: {
           name: schoolName,

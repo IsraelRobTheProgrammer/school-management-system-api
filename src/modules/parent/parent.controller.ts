@@ -5,8 +5,9 @@ import { asyncHandler } from "@/utils/asyncHandler";
 import { AppError } from "@/utils/AppError";
 import { parentService } from "./parent.service";
 import { registerParentSchema } from "./parent.schema";
+import { Controller } from "@/types/express";
 
-export const parentController = {
+export const parentController: Controller = {
   // ── Admin actions ──────────────────────────────────────────────────────────
 
   generateInvite: asyncHandler(async (req: Request, res: Response) => {

@@ -4,8 +4,9 @@ import { initializeSubscriptionSchema } from "./billing.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
+import { Controller } from "@/types/express";
 
-export const billingController = {
+export const billingController: Controller = {
   initialize: asyncHandler(async (req: Request, res: Response) => {
     if (!req.schoolId || !req.user)
       throw new AppError("Tenant context missing.", 403);

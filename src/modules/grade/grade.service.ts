@@ -1,6 +1,10 @@
+import { Grade } from "@prisma/client";
 import { prisma } from "../../config/database";
 import { AppError } from "../../utils/AppError";
-import { computeLetterGrade, getGradeRemark } from "../../utils/gradeCalculator";
+import {
+  computeLetterGrade,
+  getGradeRemark,
+} from "../../utils/gradeCalculator";
 import { CreateGradeInput, UpdateGradeInput, GradeQuery } from "./grade.schema";
 
 const gradeInclude = {
@@ -21,7 +25,16 @@ export const gradeService = {
    * Upsert pattern — entering grades is idempotent, teachers can re-enter corrections.
    */
   async upsert(schoolId: string, input: CreateGradeInput) {
-    const { studentId, subjectId, classId, term, academicYear, caScore, examScore, comment } = input;
+    const {
+      studentId,
+      subjectId,
+      classId,
+      term,
+      academicYear,
+      caScore,
+      examScore,
+      comment,
+    } = input;
 
     // Verify all FK references belong to this school
     const [student, subject, cls] = await Promise.all([
@@ -39,7 +52,7 @@ export const gradeService = {
       throw new AppError(
         "This subject does not belong to the specified class.",
         400,
-        "SUBJECT_CLASS_MISMATCH"
+        "SUBJECT_CLASS_MISMATCH",
       );
     }
 
@@ -137,7 +150,7 @@ export const gradeService = {
     schoolId: string,
     studentId: string,
     term: string,
-    academicYear: string
+    academicYear: string,
   ) {
     const student = await prisma.student.findFirst({
       where: { id: studentId, schoolId },
@@ -161,7 +174,10 @@ export const gradeService = {
       orderBy: { subject: { name: "asc" } },
     });
 
-    const totalScore = grades.reduce((sum, g) => sum + g.totalScore, 0);
+    const totalScore = grades.reduce(
+      (sum: number, g: Grade) => sum + g.totalScore,
+      0,
+    );
     const average = grades.length > 0 ? totalScore / grades.length : 0;
     const overallGrade = computeLetterGrade(average);
 
@@ -174,7 +190,7 @@ export const gradeService = {
       },
       term,
       academicYear,
-      grades: grades.map((g) => ({
+      grades: grades.map((g: any) => ({
         subject: g.subject.name,
         subjectCode: g.subject.code,
         caScore: g.caScore,
@@ -201,7 +217,7 @@ export const gradeService = {
     schoolId: string,
     classId: string,
     term: string,
-    academicYear: string
+    academicYear: string,
   ) {
     const cls = await prisma.class.findFirst({
       where: { id: classId, schoolId },
@@ -225,7 +241,10 @@ export const gradeService = {
         },
         subject: { select: { name: true, code: true } },
       },
-      orderBy: [{ student: { user: { lastName: "asc" } } }, { subject: { name: "asc" } }],
+      orderBy: [
+        { student: { user: { lastName: "asc" } } },
+        { subject: { name: "asc" } },
+      ],
     });
 
     return {

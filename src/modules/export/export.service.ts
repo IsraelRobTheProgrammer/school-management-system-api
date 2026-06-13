@@ -88,7 +88,7 @@ export const exportService = {
       "Note",
     ];
 
-    const rows = records.map((r) => [
+    const rows = records.map((r: any) => [
       `${r.student.user.firstName} ${r.student.user.lastName}`,
       r.student.admissionNumber,
       r.class.name,
@@ -174,7 +174,7 @@ export const exportService = {
       "Letter Grade",
     ];
 
-    const rows = records.map((r) => [
+    const rows = records.map((r: any) => [
       `${r.student.user.firstName} ${r.student.user.lastName}`,
       r.student.admissionNumber,
       r.class.name,

@@ -1,10 +1,15 @@
 import { Request, Response } from "express";
 import { authService } from "./auth.service";
-import { registerSchoolSchema, loginSchema, refreshTokenSchema } from "./auth.schema";
+import {
+  registerSchoolSchema,
+  loginSchema,
+  refreshTokenSchema,
+} from "./auth.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { Controller } from "@/types/express";
 
-export const authController = {
+export const authController: Controller = {
   register: asyncHandler(async (req: Request, res: Response) => {
     const { body } = registerSchoolSchema.parse({ body: req.body });
     const result = await authService.register(body);

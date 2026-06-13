@@ -1,11 +1,12 @@
-import { Router } from "express";
 import { studentController } from "./student.controller";
 import { authenticate } from "../../middlewares/auth.middleware";
 import { enforceTenant } from "../../middlewares/tenant.middleware";
 import { authorize } from "../../middlewares/rbac.middleware";
 import { requireActiveSubscription } from "../../middlewares/subscription.guard";
 
-const router = Router();
+import { createRouter } from "@/types/express";
+
+const router = createRouter();
 
 router.use(authenticate, enforceTenant, requireActiveSubscription);
 
@@ -22,7 +23,7 @@ router
 router.patch(
   "/:id/deactivate",
   authorize("SCHOOL_ADMIN"),
-  studentController.deactivate
+  studentController.deactivate,
 );
 
 export default router;

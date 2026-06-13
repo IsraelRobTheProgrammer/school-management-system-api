@@ -4,19 +4,29 @@ import { createClassSchema, updateClassSchema } from "./class.schema";
 import { sendSuccess } from "../../utils/apiResponse";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { AppError } from "../../utils/AppError";
+import { Controller } from "@/types/express";
 
-export const classController = {
+export const classController: Controller = {
   create: asyncHandler(async (req: Request, res: Response) => {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
     const { body } = createClassSchema.parse({ body: req.body });
     const cls = await classService.create(req.schoolId, body);
-    sendSuccess({ res, message: "Class created successfully.", data: cls, statusCode: 201 });
+    sendSuccess({
+      res,
+      message: "Class created successfully.",
+      data: cls,
+      statusCode: 201,
+    });
   }),
 
   getAll: asyncHandler(async (req: Request, res: Response) => {
     if (!req.schoolId) throw new AppError("Tenant context missing.", 403);
     const classes = await classService.findAll(req.schoolId);
-    sendSuccess({ res, message: "Classes fetched successfully.", data: classes });
+    sendSuccess({
+      res,
+      message: "Classes fetched successfully.",
+      data: classes,
+    });
   }),
 
   getById: asyncHandler(async (req: Request, res: Response) => {
